@@ -10,9 +10,9 @@
     "repository": {
         "type": "git",
         "url": "git+https://github.com/duyduyttt113/home.git"
-      },
-      "author": "duyduyttt113",
-      "license": "ISC",
+    },
+    "author": "duyduyttt113",
+    "license": "ISC",
     "bugs": {
         "url": "https://github.com/duyduyttt113/home/issues"
     },
@@ -25,10 +25,8 @@
         "mongoose": "^6.3.1",
         "morgan": "^1.10.0",
         "mqtt": "^4.3.7",
+        "nodemon": "^2.0.20",
         "python-shell": "^3.0.1",
         "xlsx": "^0.18.5"
-    },
-    "devDependencies": {
-        "nodemon": "^2.0.20"
     }
 }
