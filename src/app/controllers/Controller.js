@@ -1,6 +1,5 @@
 const json2csv = require('json2csv').parse
 const fs = require('fs')
-// ????
 const fields = ['Month', 'Date', 'Hour', 'temperature', 'humidity'];
 const csvReader = require('xlsx')
 const Sensor = require('../models/sensor')
@@ -125,7 +124,7 @@ class Controller {
             })
             .catch(next)
     }
-
+// is in error
     update(req, res) {
         Sensor.find({}, function(err, sensors) {
             if (err) {
@@ -142,8 +141,6 @@ class Controller {
                     if (err) {
                         return res.send('ERROR')
                     } else {
-                        // const { spawn } = require('child_process');
-                        // const pyProg = spawn('python', ['forecast/forecast.py']);
                         return res.render('home')
                     }
                 })
