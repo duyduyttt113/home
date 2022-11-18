@@ -1,9 +1,9 @@
 .site-footer {
-    background-color: #26272b;
+    background-color: #62cef5;
     padding: 45px 0 20px;
     font-size: 15px;
     line-height: 24px;
-    color: #737373;
+    color: #000000;
 }
 
 .site-footer hr {
@@ -15,20 +15,20 @@
     margin: 20px 0
 }
 
-.site-footer h6 {
+.site-footer h5 {
     color: #fff;
-    font-size: 16px;
+    font-size: 20px;
     text-transform: uppercase;
     margin-top: 5px;
     letter-spacing: 2px
 }
 
 .site-footer a {
-    color: #737373;
+    color: #000000;
 }
 
 .site-footer a:hover {
-    color: #3366cc;
+    color: #000000;
     text-decoration: none;
 }
 
@@ -42,7 +42,7 @@
 }
 
 .footer-links a {
-    color: #737373
+    color: #000000
 }
 
 .footer-links a:active,
