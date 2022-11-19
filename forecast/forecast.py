@@ -1,109 +1,127 @@
 import datetime
+	
+import math
+
 import tensorflow as tf
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
 
-#time
-today = datetime.datetime.now()
-dayPredict = today + datetime.timedelta(days=2)
 
-#read data
-file_path = 'forecast/data.csv'
-data = pd.read_csv(file_path, delimiter=',', header = 0, skipinitialspace = True)
-data.head(24)
 
-temperature = np.array(data['temperature'])
-humidity = np.array(data['humidity'])
-#declare train-test dataset
-num_periods = 24
-f_horizon = 1
-# x_train = temperature[:(len(temperature)-num_periods)]
-x_train = humidity[:(len(humidity)-num_periods)]
+# #time
+# today = datetime.datetime.now()
+# dayPredict = today + datetime.timedelta(days=2)
 
-x_batches = x_train.reshape(-1, num_periods, 1)
+# #read data
+# file_path = 'forecast/data.csv'
+# data = pd.read_csv(file_path, delimiter=',', header = 0, skipinitialspace = True)
+# data.head(24)
 
-# y_train = temperature[1:(len(temperature)-num_periods) + 1]
-y_train = humidity[1:(len(humidity)-num_periods) + 1]
+# temperature = np.array(data['temperature'])
+# humidity = np.array(data['humidity'])
+# #declare train-test dataset
+# num_periods = 24
+# f_horizon = 1
+# # x_train = temperature[:(len(temperature)-num_periods)]
+# x_train = humidity[:(len(humidity)-num_periods)]
 
-y_batches = y_train.reshape(-1, num_periods, 1)
+# x_batches = x_train.reshape(-1, num_periods, 1)
 
-def test_data(series, forecast, num):
-    # testX = temperature[-(num + forecast):][:num].reshape(-1, num_periods, 1)
-    # testY = temperature[-(num):].reshape(-1, num_periods, 1)
-    testX = humidity[-(num + forecast):][:num].reshape(-1, num_periods, 1)
-    testY = humidity[-(num):].reshape(-1, num_periods, 1)
-    return testX, testY
-# X_test, Y_test = test_data(temperature, f_horizon, 24*2)
-X_test, Y_test = test_data(humidity, f_horizon, 24*2)
+# # y_train = temperature[1:(len(temperature)-num_periods) + 1]
+# y_train = humidity[1:(len(humidity)-num_periods) + 1]
 
-#setup RNN
-tf.compat.v1.reset_default_graph()
-rnn_size = 100
-learning_rate=0.001
+# y_batches = y_train.reshape(-1, num_periods, 1)
 
-tf.compat.v1.disable_eager_execution()
-X = tf.compat.v1.placeholder(tf.float32, [None, num_periods, 1])
-Y = tf.compat.v1.placeholder(tf.float32, [None, num_periods, 1])
+# def test_data(series, forecast, num):
+#     # testX = temperature[-(num + forecast):][:num].reshape(-1, num_periods, 1)
+#     # testY = temperature[-(num):].reshape(-1, num_periods, 1)
+#     testX = humidity[-(num + forecast):][:num].reshape(-1, num_periods, 1)
+#     testY = humidity[-(num):].reshape(-1, num_periods, 1)
+#     return testX, testY
+# # X_test, Y_test = test_data(temperature, f_horizon, 24*2)
+# X_test, Y_test = test_data(humidity, f_horizon, 24*2)
 
-rnn_cells=tf.compat.v1.nn.rnn_cell.BasicRNNCell(num_units=rnn_size, activation=tf.nn.relu)
-rnn_output, states = tf.compat.v1.nn.dynamic_rnn(rnn_cells, X, dtype=tf.float32)
+# #setup RNN
+# tf.compat.v1.reset_default_graph()
+# rnn_size = 100
+# learning_rate=0.001
 
-output=tf.reshape(rnn_output, [-1, rnn_size])
-logit=tf.compat.v1.layers.dense(output, 1, name="softmax")
+# tf.compat.v1.disable_eager_execution()
+# X = tf.compat.v1.placeholder(tf.float32, [None, num_periods, 1])
+# Y = tf.compat.v1.placeholder(tf.float32, [None, num_periods, 1])
 
-outputs=tf.reshape(logit, [-1, num_periods, 1])
-print(logit)
+# rnn_cells=tf.compat.v1.nn.rnn_cell.BasicRNNCell(num_units=rnn_size, activation=tf.nn.relu)
+# rnn_output, states = tf.compat.v1.nn.dynamic_rnn(rnn_cells, X, dtype=tf.float32)
 
-loss = tf.reduce_sum(input_tensor=tf.square(outputs - Y))
+# output=tf.reshape(rnn_output, [-1, rnn_size])
+# logit=tf.compat.v1.layers.dense(output, 1, name="softmax")
 
-accuracy = tf.reduce_mean(input_tensor=tf.cast(tf.equal(tf.argmax(input=logit, axis=1), tf.cast(Y, tf.int64)), tf.float32))
-optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate=learning_rate)
-train_step=optimizer.minimize(loss)
+# outputs=tf.reshape(logit, [-1, num_periods, 1])
+# print(logit)
 
-epochs = 1000
+# loss = tf.reduce_sum(input_tensor=tf.square(outputs - Y))
 
-sess = tf.compat.v1.Session()
-init = tf.compat.v1.global_variables_initializer()
-sess.run(init)
+# accuracy = tf.reduce_mean(input_tensor=tf.cast(tf.equal(tf.argmax(input=logit, axis=1), tf.cast(Y, tf.int64)), tf.float32))
+# optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate=learning_rate)
+# train_step=optimizer.minimize(loss)
 
-for epoch in range(epochs):
-    train_dict = {X: x_batches, Y: y_batches}
-    sess.run(train_step, feed_dict=train_dict)
-#save model
-saver = tf.compat.v1.train.Saver()
-save_path = saver.save(sess, "models/model.ckpt")
+# epochs = 1000
 
-#restore variables from disk.
-with tf.compat.v1.Session() as sess:
-    saver.restore(sess, "models/model.ckpt")
-    y_pred=sess.run(outputs, feed_dict={X: X_test})
-    print ('Y predict:')
-    y_pred = y_pred.reshape(2, 24)
-    hourList = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
-    for i in range (0, 24):
-        y_pred[0][i] = round((y_pred[0][i]), 2)
-    print (y_pred[0])
+# sess = tf.compat.v1.Session()
+# init = tf.compat.v1.global_variables_initializer()
+# sess.run(init)
 
-    df = pd.read_csv('forecast/csv/1311.csv')
-    df.insert(3, 'humidity', y_pred[0])
-    df.to_csv('forecast/csv/1311.csv')
+# for epoch in range(epochs):
+#     train_dict = {X: x_batches, Y: y_batches}
+#     sess.run(train_step, feed_dict=train_dict)
+# #save model
+# saver = tf.compat.v1.train.Saver()
+# save_path = saver.save(sess, "models/model.ckpt")
 
-    # df = pd.DataFrame({"Hour": hourList, "temperature": y_pred[0]})  
-    # df.to_csv('forecast/csv/1311.csv')
-    #df.to_csv('forecast/csv/' + str(dayPredict.date + 1) + str(dayPredict.month) + '.csv')
+# #restore variables from disk.
+# with tf.compat.v1.Session() as sess:
+#     saver.restore(sess, "models/model.ckpt")
+#     y_pred=sess.run(outputs, feed_dict={X: X_test})
+#     print ('Y predict:')
+#     y_pred = y_pred.reshape(2, 24)
+#     hourList = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+#     for i in range (0, 24):
+#         y_pred[0][i] = round((y_pred[0][i]), 2)
+#     print (y_pred[0])
 
-# Y = pd.read_csv('forecast/csv/' + str(today.date + 1) + str(today.month) + '.csv')
-'''Y = pd.read_csv('forecast/csv/127.csv')
+#     df = pd.read_csv('forecast/csv/1311.csv')
+#     df.insert(3, 'humidity', y_pred[0])
+#     df.to_csv('forecast/csv/1311.csv')
+
+#     # df = pd.DataFrame({"Hour": hourList, "temperature": y_pred[0]})  
+#     # df.to_csv('forecast/csv/1311.csv')
+#     #df.to_csv('forecast/csv/' + str(dayPredict.date + 1) + str(dayPredict.month) + '.csv')
+
+# # Y = pd.read_csv('forecast/csv/' + str(today.date + 1) + str(today.month) + '.csv')
+Y = pd.read_csv('forecast/csv/1311.csv')
+# y_pred = Y['temperature']
 y_pred = Y['humidity']
 df = pd.read_csv('forecast/data.csv')
-# m = df[(df['Month'] == today.month) & (df['Date'] == today.date)]
-m = df[(df['Month'] == 7) & (df['Date'] == 12)]
+m = df[(df['Month'] == 11) & (df['Date'] == 13)]
+# Y_test = m['temperature']
 Y_test = m['humidity']
-plt.title("So sánh độ ẩm dự đoán với độ ẩm thực tế", fontsize=14)
-plt.plot(pd.Series(np.ravel(Y_test)), "bo", markersize=5, label="Actual")
-plt.plot(pd.Series(np.ravel(y_pred)), "r.", markersize=5, label="Predict")
+# plt.title("Compare temperature Actual vs Predict", fontsize=14)
+plt.title("Compare humidity Actual vs Predict", fontsize=14)
+
+plt.plot(pd.Series(np.ravel(Y_test)), "b.", markersize=5, label="Actual")
+plt.plot(pd.Series(np.ravel(y_pred)), "r.", markersize=10, label="Predict")
 plt.legend(loc="upper left")
-plt.xlabel("Thời gian")
+plt.ylabel("%")
+# plt.ylabel("°C")
+
+plt.xlabel("Time periods")
+# plt.show()
 # plt.savefig('src/public/img/' + str(today.date + 1) + str(today.month) + '.png')
-plt.savefig('src/public/img/h127.png')'''
+# plt.savefig('src/public/img/1311.png')
+a=0
+for i in range(24):
+   a+= (y_pred[i]-Y_test[i])*(y_pred[i]-Y_test[i])
+
+print(a)
