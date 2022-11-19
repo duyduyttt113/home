@@ -1,7 +1,4 @@
 import datetime
-	
-import math
-
 import tensorflow as tf
 import pandas as pd
 import numpy as np
@@ -117,11 +114,6 @@ plt.ylabel("%")
 # plt.ylabel("°C")
 
 plt.xlabel("Time periods")
-# plt.show()
+plt.show()
 # plt.savefig('src/public/img/' + str(today.date + 1) + str(today.month) + '.png')
 # plt.savefig('src/public/img/1311.png')
-a=0
-for i in range(24):
-   a+= (y_pred[i]-Y_test[i])*(y_pred[i]-Y_test[i])
-
-print(a)
