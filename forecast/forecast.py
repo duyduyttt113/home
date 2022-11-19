@@ -14,21 +14,28 @@ data = pd.read_csv(file_path, delimiter=',', header = 0, skipinitialspace = True
 data.head(24)
 
 temperature = np.array(data['temperature'])
-
+humidity = np.array(data['humidity'])
 #declare train-test dataset
 num_periods = 24
 f_horizon = 1
-x_train = temperature[:(len(temperature)-num_periods)]
+# x_train = temperature[:(len(temperature)-num_periods)]
+x_train = humidity[:(len(humidity)-num_periods)]
+
 x_batches = x_train.reshape(-1, num_periods, 1)
 
-y_train = temperature[1:(len(temperature)-num_periods) + 1]
+# y_train = temperature[1:(len(temperature)-num_periods) + 1]
+y_train = humidity[1:(len(humidity)-num_periods) + 1]
+
 y_batches = y_train.reshape(-1, num_periods, 1)
 
 def test_data(series, forecast, num):
-    testX = temperature[-(num + forecast):][:num].reshape(-1, num_periods, 1)
-    testY = temperature[-(num):].reshape(-1, num_periods, 1)
+    # testX = temperature[-(num + forecast):][:num].reshape(-1, num_periods, 1)
+    # testY = temperature[-(num):].reshape(-1, num_periods, 1)
+    testX = humidity[-(num + forecast):][:num].reshape(-1, num_periods, 1)
+    testY = humidity[-(num):].reshape(-1, num_periods, 1)
     return testX, testY
-X_test, Y_test = test_data(temperature, f_horizon, 24*2)
+# X_test, Y_test = test_data(temperature, f_horizon, 24*2)
+X_test, Y_test = test_data(humidity, f_horizon, 24*2)
 
 #setup RNN
 tf.compat.v1.reset_default_graph()
@@ -78,23 +85,21 @@ with tf.compat.v1.Session() as sess:
         y_pred[0][i] = round((y_pred[0][i]), 2)
     print (y_pred[0])
 
-    # df = pd.read_csv('forecast/csv/28.csv')
-    # df.insert(3, 'humidity', y_pred[0])
-    # df.to_csv('forecast/csv/28.csv')
+    df = pd.read_csv('forecast/csv/1311.csv')
+    df.insert(3, 'humidity', y_pred[0])
+    df.to_csv('forecast/csv/1311.csv')
 
-    df = pd.DataFrame({"Hour": hourList, "temperature": y_pred[0]})  
-    df.to_csv('forecast/csv/28.csv')
+    # df = pd.DataFrame({"Hour": hourList, "temperature": y_pred[0]})  
+    # df.to_csv('forecast/csv/1311.csv')
     #df.to_csv('forecast/csv/' + str(dayPredict.date + 1) + str(dayPredict.month) + '.csv')
 
 # Y = pd.read_csv('forecast/csv/' + str(today.date + 1) + str(today.month) + '.csv')
 '''Y = pd.read_csv('forecast/csv/127.csv')
 y_pred = Y['humidity']
-
 df = pd.read_csv('forecast/data.csv')
 # m = df[(df['Month'] == today.month) & (df['Date'] == today.date)]
 m = df[(df['Month'] == 7) & (df['Date'] == 12)]
 Y_test = m['humidity']
-
 plt.title("So sánh độ ẩm dự đoán với độ ẩm thực tế", fontsize=14)
 plt.plot(pd.Series(np.ravel(Y_test)), "bo", markersize=5, label="Actual")
 plt.plot(pd.Series(np.ravel(y_pred)), "r.", markersize=5, label="Predict")
