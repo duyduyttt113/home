@@ -7,11 +7,11 @@ var timeInUTC7 = timeInMilliseconds + (7 * 60 * 60 * 1000)
 var timeSaveInUTC7 = new Date(timeInUTC7)
 
 const Sensor = new Schema({
-    Month: { type: Number, require: true, default: timeSaveInUTC7.getMonth() + 1 },
+    Month: { type: Number, require: true, default: timeSaveInUTC7.getMonth() + 1},
     Date: { type: Number, require: true, default: timeSaveInUTC7.getDate() },
     Hour: { type: Number, require: true, default: timeSaveInUTC7.getHours() },
     temperature: { type: Number, require: true },
     humidity: { type: Number, require: true },
 }, );
-
+// model ket noi voi database. Sensor->sensors.
 module.exports = mongoose.model('Sensor', Sensor);

@@ -6,6 +6,23 @@
     color: #000000;
 }
 
+body {
+    /* padding-bottom: 200px; */
+    height: 100%;
+    display: grid;
+    sgrid-template-rows: 1fr auto;
+}
+
+footer {
+    /* position: fixed; */
+    position: static;
+
+    /* top: 50%; */
+    bottom: 0;
+    width: 100%;
+    background: #6cf;
+ }
+ 
 .site-footer hr {
     border-top-color: #bbb;
     opacity: 0.5
