@@ -7,20 +7,21 @@
 
 <body>
     
-    
-
-    
     <div class="mt-4">
-        <div class="row">
-            <h1 style="color: orange">Kết quả dự đoán </h1>
+        <div class="col d-flex justify-content-center">
+                    <h1 style="color: orange">Kết quả dự đoán</h1> </div>
+        <div class="col d-flex justify-content-center">
             <form action="/history">
                 <input type="date" id="day" name="day">
                 <button type="submit">Tra cứu</button>
-            </form>
-            <div class="mt-4"></div>
+            </form></div>
+        <div class="row">
+            {{!-- <div class="mt-4"></div> --}}
             <div class="col"></div>
             <div class="col-8">
+                <div class="col d-flex justify-content-center">
                 <h1 id="date" style="color: orange">Kết quả dự đoán ngày: {{dateShow}}-{{monthShow}} </h1>
+                </div>
                 <table class="table table-striped">
                     <thead>
                         <tr>
