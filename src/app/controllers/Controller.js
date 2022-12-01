@@ -157,11 +157,15 @@ class Controller {
         var timeInMilliseconds = time.getTime()
         var timeTomorrow = timeInMilliseconds + ((7 + 24) * 60 * 60 * 1000)
         var timeShow = new Date(timeTomorrow)
-        var dateShow = 13
-        var monthShow = timeShow.getMonth() + 1
+        // var dateShow = timeShow.getDate()
+        // var monthShow = timeShow.getMonth() + 1
+        var dateShow = 30
+        
+        var monthShow = 11
+        
 
-        // const filePathCSV = `forecast/csv/1311.csv`
-        const filePathCSV = `forecast/csv/${dateShow}${monthShow}.csv`
+        const filePathCSV = `forecast/csv/3011.csv`
+        // const filePathCSV = `forecast/csv/${dateShow}${monthShow}.csv`
         const tomorrowData = csvReader.readFile(filePathCSV)
         const sheets = tomorrowData.SheetNames
         const prediction = csvReader.utils.sheet_to_json(tomorrowData.Sheets[sheets])
@@ -171,6 +175,7 @@ class Controller {
             monthShow,
         })
     }
+
 
     store(req, res, next) {
         const sensor = new Sensor(req.query)
